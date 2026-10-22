@@ -38,3 +38,22 @@
 - 昵称已脱敏，定位用户以 `user_homepage` 或 `creator_hash` 为准。
 - 意向规则表可按品类词（内存/固态等）微调，弱意图（规格/价格）名单需人工复核。
 - 每次运行必须生成新批次目录，禁止覆盖旧批次。
+
+## 5. 开发流程（强制 superpowers 工作流）
+
+任何功能新增、行为修改、Bug 修复（非纯对话/咨询）都必须走 superpowers 工作流，不允许跳过需求梳理与设计评审直接写代码：
+
+1. `brainstorming`：探索需求，逐个澄清问题，与用户核对需求，提出方案并取得用户对设计的确认。
+2. 撰写设计文档：保存到 `docs/superpowers/specs/YYYY-MM-DD-<功能名>-design.md`，完成后必须请用户评审该文档；用户批准前不得进入实现。
+3. `writing-plans`：将已批准的设计拆解为实现计划，保存到 `docs/superpowers/plans/`。
+4. `executing-plans` + `tdd`：按计划实现并用测试验证。
+5. 交付记录：写 `docs/superpowers/notes/YYYY-MM-DD-<功能名>.md`（如适用）。
+
+上述 superpowers 流程所需的 skill（`brainstorming`、`writing-plans`、`executing-plans`、`tdd`、`test-driven-development` 等）视为本项目默认启用且为必经环节，不要求用户逐次点名或提醒；`grilling`、`grill-me` 仍遵守下文"技能使用限制"。
+
+## 6. 技能使用限制
+
+本节适用于本项目所有任务，包括前端和后端。
+
+- 默认不使用 `shunan-sales-contract`、`wechat-intel-architect`、`grilling`、`grill-me` 这四个技能。
+- 只有用户在当前任务中主动提及并要求使用对应技能时，才可加载并应用；不得仅因任务相关或文件中出现技能名称而自动使用。
