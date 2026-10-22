@@ -1,4 +1,4 @@
-# 抖音数据销售分析（离线版）
+# media-data-analysis
 
 对 MediaCrawler 导出的抖音搜索数据做**离线销售分析**（纯 Python 标准库，无大模型、无第三方依赖）。
 
