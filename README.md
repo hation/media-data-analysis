@@ -25,4 +25,10 @@ python analyze.py [数据目录]
 
 ## 数据说明
 
-`input/`（爬取数据）与 `output/`（含潜在客户名单、KOC 用户主页链接）**不随仓库提交**，已由 `.gitignore` 排除。如需分析，请自行将 MediaCrawler 导出的 CSV 放入 `input/` 后运行。
+`input/`（爬取数据）与 `output/`（含潜在客户名单、KOC 用户主页链接）**不随仓库提交**，已由 `.gitignore` 排除（目录以 `.gitkeep` 占位保留）。如需分析，请自行将 MediaCrawler 导出的 CSV 放入 `input/` 后运行。
+
+## 其他 Agent 无缝接入
+
+- **Codex**：仓库根目录已提供 `AGENTS.md`（Codex 自动加载的项目指令），克隆后用 Codex 打开项目即自动按五步流程分析，无需额外配置。
+- **TRAE**：`.trae/rules/project_rules.md` 与 `.trae/skills/analyze-douyin-keyword/` 在会话中自动加载，规则与 `AGENTS.md` 一致。
+
