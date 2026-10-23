@@ -7,3 +7,6 @@ output/*
 # Python 缓存
 __pycache__/
 *.pyc
+
+# 打包产物（发送给 Windows 用户离线运行用，不入库）
+media-data-analysis-windows.zip
