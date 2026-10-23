@@ -256,6 +256,64 @@ print(f"    强意向 {sum(1 for l in leads if l['意向层级']=='强意向')} 
 
 
 # ================================================================
+# 7. 意向评论明细（每条命中意向判定的评论一行，携带所在视频标题/创作者/链接，
+#    与名单同口径 score>=2，按评论时间倒序）
+# ================================================================
+# 构建视频索引：aweme_id -> {标题, 视频创作者, 视频链接}
+video_map = {}
+for v in CONTENTS:
+    video_map[v["aweme_id"]] = {
+        "标题": v["title"] or "",
+        "视频创作者": v["nickname"] or "",
+        "视频链接": v["aweme_url"] or f"https://www.douyin.com/video/{v['aweme_id']}",
+    }
+
+# 遍历去重评论，score >= 2 输出一行明细（与名单同口径），按 create_time 数值降序
+detail_rows = []
+for c in COMMENTS:
+    content = c["content"] or ""
+    score, hits = 0, []
+    for label, weight, pattern in INTENT_PATTERNS:
+        if pattern.search(content):
+            score += weight
+            hits.append(label)
+    if score < 2:
+        continue
+    try:
+        ctime = int(float(c["create_time"]))
+    except (TypeError, ValueError):
+        ctime = 0
+    vm = video_map.get(c["aweme_id"], {})
+    detail_rows.append({
+        "_ts": ctime,
+        "昵称": c["nickname"] or "",
+        "用户ID": c["creator_hash"] or c["user_homepage"] or c["nickname"] or "",
+        "用户主页": c["user_homepage"] or "",
+        "得分": score,
+        "命中意图标签": ",".join(dict.fromkeys(hits)),
+        "评论内容": content,
+        "评论获赞": to_int(c["like_count"]),
+        "评论时间": ts_to_str(c["create_time"]),
+        "视频标题": vm.get("标题", ""),
+        "视频创作者": vm.get("视频创作者", ""),
+        "视频链接": vm.get("视频链接", ""),
+    })
+detail_rows.sort(key=lambda r: r["_ts"], reverse=True)
+for r in detail_rows:
+    r.pop("_ts")
+
+fields_detail = ["昵称", "用户ID", "用户主页", "得分", "命中意图标签", "评论内容", "评论获赞",
+                 "评论时间", "视频标题", "视频创作者", "视频链接"]
+write_detail = os.path.join(BATCH_DIR, "意向评论明细.csv")
+with open(write_detail, "w", encoding="utf-8-sig", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=fields_detail)
+    w.writeheader()
+    for r in detail_rows:
+        w.writerow({k: r[k] for k in fields_detail})
+print(f"[7] 意向评论明细已写出: {write_detail}（{len(detail_rows)} 条，按评论时间倒序）")
+
+
+# ================================================================
 # 3. KOC / 种子客户（全量评论按获赞排序，高影响力用户优先建联，
 #    不受意向关键词限制，并标注是否同时是意向用户）
 # ================================================================
@@ -344,6 +402,7 @@ summary_lines = [
     f"意向用户: 共 {len(leads)} 人（强 {sum(1 for l in leads if l['意向层级'] == '强意向')} / "
     f"中 {sum(1 for l in leads if l['意向层级'] == '中意向')} / 弱 {sum(1 for l in leads if l['意向层级'] == '弱意向')}）",
     f"KOC 名单: {len(koc_rows)} 人 / 选题标签: {len(topic_rows)} 个",
+    f"意向评论明细: {len(detail_rows)} 条",
 ]
 write_summary = os.path.join(BATCH_DIR, "运行摘要.txt")
 with open(write_summary, "w", encoding="utf-8") as f:
