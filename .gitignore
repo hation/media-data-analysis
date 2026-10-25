@@ -4,6 +4,9 @@ input/*
 output/*
 !output/.gitkeep
 
+# 归档的源数据（含评论者主页等隐私，与 input 同理不入库）
+archive/
+
 # Python 缓存
 __pycache__/
 *.pyc
