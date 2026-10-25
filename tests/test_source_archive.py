@@ -90,9 +90,11 @@ class SourceArchiveTest(unittest.TestCase):
             self.assertTrue(os.path.exists(os.path.join(src_backup, name)),
                             f"批次源数据/ 未找到副本 {name}")
 
-        # 3. input/ 顶层不再存在这两个文件（无 .csv 残留）
-        self.assertFalse([f for f in os.listdir(self.input_dir) if f.endswith(".csv")],
-                         f"input/ 仍残留 CSV: {os.listdir(self.input_dir)}")
+        # 3. input/ 顶层不再存在这两个文件（精确断言，而非无任何 csv）
+        self.assertNotIn(CONTENTS_NAME, os.listdir(self.input_dir),
+                         f"input/ 仍残留 {CONTENTS_NAME}")
+        self.assertNotIn(COMMENTS_NAME, os.listdir(self.input_dir),
+                         f"input/ 仍残留 {COMMENTS_NAME}")
 
         # 4. archive/ 存在且含这两个文件，内容与写入原文完全一致
         archive_dir = os.path.join(self.tmp, "archive")

@@ -89,6 +89,7 @@ print(f"读取数据: 视频 {len(CONTENTS)} 条 / 评论 {len(COMMENTS)} 条（
 
 # 批次目录：output/关键词_平台_yyyymmddhhmm（关键词/平台从文件名解析）
 _contents_path = find_csv("search_contents")
+_comments_path = find_csv("search_comments")
 _name_match = re.search(r"_([^_]+)_([^_]+)\.csv$", os.path.basename(_contents_path))
 keyword = _name_match.group(1) if _name_match else CONTENTS[0].get("source_keyword") or "关键词"
 platform = _name_match.group(2) if _name_match else "douyin"
@@ -393,7 +394,7 @@ print(f"    高峰发布时段: " + ", ".join(f"{k}时({n}条)" for k, n in top_
 summary_lines = [
     f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
     f"输入视频文件: {os.path.basename(_contents_path)}",
-    f"输入评论文件: {os.path.basename(find_csv('search_comments'))}",
+    f"输入评论文件: {os.path.basename(_comments_path)}",
     f"品类规则: {keyword}（来自 config/品类规则.json）",
     f"去重后数据: 视频 {len(CONTENTS)} 条 / 评论 {len(COMMENTS)} 条",
     f"爆款类型: 实用型 {sum(1 for r in viral_rows if '实用型' in r['爆款类型'])} / "
@@ -416,7 +417,7 @@ os.makedirs(ARCHIVE_DIR, exist_ok=True)
 src_backup_dir = os.path.join(BATCH_DIR, "源数据")
 os.makedirs(src_backup_dir, exist_ok=True)
 _archived = 0
-for _p in (_contents_path, find_csv("search_comments")):
+for _p in (_contents_path, _comments_path):
     _name = os.path.basename(_p)
     if not os.path.exists(_p):
         print(f"【警告】源文件不存在，跳过归档: {_p}")
