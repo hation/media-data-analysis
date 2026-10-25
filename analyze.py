@@ -17,6 +17,7 @@ import csv
 import json
 import os
 import re
+import shutil
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -408,5 +409,25 @@ write_summary = os.path.join(BATCH_DIR, "运行摘要.txt")
 with open(write_summary, "w", encoding="utf-8") as f:
     f.write("\n".join(summary_lines) + "\n")
 print(f"[6] 运行摘要已写出: {write_summary}")
+
+# 7. 源数据归档：复制到批次源数据/ 并移出 input 至 archive/（仅本次运行的源文件）
+ARCHIVE_DIR = os.path.join(BASE_DIR, "archive")
+os.makedirs(ARCHIVE_DIR, exist_ok=True)
+src_backup_dir = os.path.join(BATCH_DIR, "源数据")
+os.makedirs(src_backup_dir, exist_ok=True)
+_archived = 0
+for _p in (_contents_path, find_csv("search_comments")):
+    _name = os.path.basename(_p)
+    if not os.path.exists(_p):
+        print(f"【警告】源文件不存在，跳过归档: {_p}")
+        continue
+    shutil.copy2(_p, os.path.join(src_backup_dir, _name))
+    shutil.move(_p, os.path.join(ARCHIVE_DIR, _name))
+    print(f"[7] 源数据已归档: {_name} → {src_backup_dir}")
+    print(f"[7] 源数据已移出 input: {_name} → {ARCHIVE_DIR}")
+    _archived += 1
+with open(write_summary, "a", encoding="utf-8") as f:
+    f.write(f"源数据归档: {_archived} 个文件已复制至批次源数据/ 并移出 input 至 archive/\n")
+print(f"[7] 源数据归档完成: {_archived} 个文件 → 批次源数据/ + archive/")
 
 print("全部完成。产出批次目录:", BATCH_DIR)
